@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>DeepSeek V4.1 Flash · 交互式架构图</title>
+<style>
+:root {
+  --paper: #eef3f8; --panel: #fff; --ink: #142541; --muted: #4b5d73;
+  --line: #cdd8e6; --blue: #2345a3; --pale: #edf2ff; --teal: #17675f;
+  --green-bg: #e6f5ef; --gold: #76551d; --gold-bg: #fbf1de;
+  --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --sans: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.62 var(--sans); }
+a { color: var(--blue); text-underline-offset: 3px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid #3360ca; outline-offset: 3px; }
+[hidden] { display: none !important; }
+.wrap { width: min(1260px, calc(100% - 48px)); margin-inline: auto; }
+.site-head { background: #132442; color: #eff5ff; border-bottom: 1px solid #294469; }
+.site-head .wrap { min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.site-head a { color: #cfddf4; font-size: 13px; }
+.brand { display: flex; gap: 10px; align-items: center; font-weight: 700; }
+.mark { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 7px; background: #acc3ff; color: #142e74; }
+.hero { padding-block: 25px 22px; }
+.eyebrow { margin: 0; color: var(--blue); font: 750 11px/1.4 var(--mono); letter-spacing: .09em; }
+.hero h1 { margin: 4px 0 6px; font-size: clamp(32px, 5.2vw, 59px); line-height: 1.05; letter-spacing: -.06em; }
+.hero h1 span { color: var(--blue); }
+.hero p:last-child { margin: 0; color: var(--muted); }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 19px; border-block: 1px solid var(--line); }
+.metrics div { padding: 8px 14px; border-left: 1px solid var(--line); }
+.metrics div:first-child { padding-left: 0; border-left: 0; }
+.metrics dt { color: var(--muted); font-size: 11px; }
+.metrics dd { margin: 1px 0 0; font: 700 clamp(16px, 2.6vw, 25px)/1.2 var(--mono); letter-spacing: -.055em; }
+.surface { border: 1px solid var(--line); border-radius: 13px; background: var(--panel); }
+.section-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.section-head h2 { margin: 0; font-size: 21px; letter-spacing: -.035em; }
+.section-head p { margin: 1px 0 0; color: var(--muted); font-size: 12px; }
+.overview { padding: 14px 16px 13px; }
+.toggle { display: flex; gap: 3px; padding: 3px; border-radius: 7px; background: var(--pale); }
+.toggle button { border: 0; padding: 4px 9px; border-radius: 4px; background: transparent; color: var(--blue); font-size: 12px; font-weight: 700; }
+.toggle button[aria-pressed="true"] { background: var(--blue); color: white; }
+.graph { margin-top: 12px; }
+.input-tracks { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.42fr); gap: 12px; }
+.track { min-width: 0; padding: 8px; border-radius: 8px; background: #f3f6fb; border: 1px solid #dce4ef; }
+.track.vision { background: #f0f8f5; border-color: #d2e7de; }
+.track.vision.historical { background: #f1f3f6; border-style: dashed; border-color: var(--line); }
+.historical .node[data-tone="vision"]:not([aria-pressed="true"]) { background: #f8f9fb; border-color: var(--line); }
+.track h3 { margin: 0 0 4px; font: 700 11px/1.4 var(--mono); color: var(--muted); }
+.flow-row { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 16px; }
+.flow-cell { min-width: 0; position: relative; }
+.flow-cell + .flow-cell::before { content: "→"; position: absolute; left: -16px; width: 16px; top: 50%; translate: 0 -50%; text-align: center; font-size: 14px; color: #526d97; }
+.node { width: 100%; height: 100%; min-height: 55px; border: 1px solid #c5d3e7; border-radius: 6px; background: white; padding: 6px 7px; text-align: left; line-height: 1.26; overflow-wrap: anywhere; }
+.node strong, .node small { display: block; }
+.node strong { font-size: 13px; }
+.node small { margin-top: 4px; color: var(--muted); font: 11px/1.3 var(--mono); }
+.node[data-tone="vision"] { border-color: #b6d8cb; }
+.node[data-tone="core"] { background: var(--pale); border-color: #b1c0e9; }
+.node[data-tone="output"] { background: #eef7f9; border-color: #b7d4df; }
+.node:hover, .node[aria-pressed="true"] { border-color: #3354a5; background: #e1eaff; }
+.node[aria-pressed="true"] { box-shadow: inset 0 0 0 1px #3354a5; }
+.join { display: grid; place-items: center; height: 19px; color: var(--blue); font-size: 14px; }
+.join::before { content: ""; height: 7px; width: 56%; border: solid #9aafca; border-width: 0 1px 1px; align-self: start; grid-area: 1 / 1; }
+.join span { grid-area: 1 / 1; align-self: end; line-height: 14px; }
+.join.single::before { display: none; }
+.main-row { --n: 6; }
+.branch-notes { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; margin-top: 8px; }
+.branch { display: flex; align-items: start; gap: 8px; padding: 6px 8px; border: 1px dashed #abc2d8; border-radius: 6px; color: #284668; background: #f6fafe; font-size: 12px; line-height: 1.42; }
+.branch button { border: 0; background: transparent; padding: 0; font-weight: 750; color: var(--blue); text-align: left; }
+.branch button:hover { text-decoration: underline; }
+.branch.draft { background: #faf7ef; color: var(--gold); border-color: #d6c397; }
+.branch.draft button { color: var(--gold); }
+.mode-note { margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+.explorer { margin-top: 15px; }
+.explorer > .section-head { margin-bottom: 8px; }
+.catalog { display: grid; gap: 8px; padding: 10px; margin-bottom: 9px; }
+.topic-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.layer-group { min-width: 0; }
+.layer-group h3 { margin: 0 0 5px; font-size: 13px; }
+.layer-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.layer-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
+.layer { min-width: 0; border: 1px solid #c0cedf; border-radius: 5px; background: #f3f6fb; padding: 4px 2px; font: 750 12px/1.35 var(--mono); }
+.layer small { display: block; margin-top: 2px; font-size: 8px; color: var(--muted); }
+.layer[data-kind="Full"] { background: #e4edff; border-color: #9cb4e6; }
+.layer[data-kind="Reindex"] { background: var(--green-bg); border-color: #a6cfc0; }
+.layer[data-kind="SWA"] { background: var(--gold-bg); border-color: #dec8a3; }
+.layer:hover, .layer[aria-pressed="true"] { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
+.layer-legend { margin: 0; color: var(--muted); font-size: 12px; }
+.inspect { overflow: hidden; scroll-margin-top: 12px; }
+.inspect-head { padding: 13px 17px; background: #172e54; color: white; }
+.inspect-head .eyebrow { color: #b5caf2; }
+.inspect-head h2 { margin: 3px 0 1px; font-size: 25px; line-height: 1.2; }
+.inspect-head p:last-child { margin: 5px 0 0; color: #dfe9fa; font-size: 13px; }
+.detail-body { display: grid; grid-template-columns: minmax(245px, .83fr) minmax(0, 1.5fr); gap: 14px; padding: 14px 17px; }
+.detail-aside, .detail-flow { min-width: 0; }
+.detail-body h3 { margin: 0 0 6px; font-size: 14px; }
+.detail-body p { margin: 0 0 8px; font-size: 13px; }
+.io { display: grid; gap: 6px; margin-bottom: 9px; }
+.io div { background: #f4f7fb; border: 1px solid #dce4ef; border-radius: 6px; padding: 6px 8px; }
+.io strong { display: block; font-size: 11px; color: var(--blue); }
+code { font: .92em var(--mono); background: #edf2fa; padding: 1px 3px; border-radius: 3px; overflow-wrap: anywhere; }
+.io code { background: none; padding: 0; }
+.scope, .scope code { color: var(--muted); }
+.detail-body .scope { font-size: 12px; }
+.detail-links { display: flex; flex-wrap: wrap; gap: 5px 10px; align-items: center; margin-top: 9px; font-size: 12px; }
+.detail-links button { border: 1px solid var(--line); background: var(--pale); border-radius: 5px; padding: 3px 7px; font-size: 12px; color: var(--blue); }
+.detail-links button:hover { border-color: var(--blue); }
+.phase + .phase::before { content: "↓"; display: block; text-align: center; color: #47659a; line-height: 17px; }
+.lanes { display: grid; gap: 6px; }
+.lanes.parallel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lane { min-width: 0; background: #eef3fa; border: 1px solid #d5e0ee; padding: 5px; border-radius: 7px; }
+.lane.wide { grid-column: 1 / -1; }
+.lane h4 { margin: 1px 3px 4px; color: #355688; font-size: 11px; }
+.steps { list-style: none; padding: 0; margin: 0; }
+.step { min-width: 0; position: relative; padding: 5px 7px; border: 1px solid #d5e0ee; border-radius: 5px; background: white; overflow-wrap: anywhere; }
+.step + .step { margin-top: 12px; }
+.step + .step::before { content: "↓"; position: absolute; left: 11px; top: -13px; color: #496799; font-size: 11px; }
+.step > strong { display: block; font-size: 13px; }
+.step > code { display: inline-block; margin: 2px 0 3px; color: #264a87; font-size: 11px; }
+.detail-body .step p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.params { display: grid; gap: 1px; margin-top: 4px; padding-top: 3px; border-top: 1px dotted var(--line); font-size: 11px; }
+.params code { background: transparent; padding: 0; font-size: 11px; }
+.more { margin-top: 7px; }
+.more summary { cursor: pointer; color: var(--blue); font-size: 12px; font-weight: 700; }
+.more > div { margin-top: 4px; }
+.principles { grid-column: 1 / -1; min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+.principles > h3 { font-size: 18px; }
+.principle-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.principle-card, .sink-demo { min-width: 0; padding: 9px 11px; background: #f5f8fc; border: 1px solid #d7e2ef; border-radius: 7px; }
+.principle-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.principle-card h4, .sink-demo h4 { margin: 0 0 4px; font-size: 14px; }
+.principle-card p:last-child, .sink-demo p:last-child { margin-bottom: 0; }
+.principle-card code { overflow-wrap: anywhere; }
+.principle-card .equation { display: block; margin: 0 0 7px; padding: 5px 7px; color: #264a87; }
+.sink-demo { margin-top: 8px; }
+.sink-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(245px, 1.15fr); gap: 10px 16px; }
+.sink-controls { display: grid; gap: 4px; margin: 5px 0 7px; color: #234381; font-weight: 700; font-size: 13px; }
+.sink-controls input { width: 100%; margin: 2px 0; accent-color: var(--blue); }
+.sink-demo .sink-readout { color: #284668; font-weight: 650; }
+.matrix { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 2px; text-align: center; font: 12px/1.4 var(--mono); }
+.matrix caption { text-align: left; color: var(--muted); margin-bottom: 2px; font: 12px/1.4 var(--sans); }
+.matrix th, .matrix td { padding: 4px 1px; border-radius: 3px; overflow-wrap: anywhere; }
+.matrix th { background: #e6edf8; color: #284668; }
+.matrix td { background: rgb(64 118 229 / var(--tint, 0.09)); }
+.matrix .sum { background: #e6f5ef; color: var(--teal); font-weight: 750; }
+.example-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.example-table th, .example-table td { text-align: left; padding: 4px 5px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.sources { margin-block: 20px 25px; color: var(--muted); font-size: 12px; }
+.sources h2 { margin: 0 0 5px; color: var(--ink); font-size: 16px; }
+.sources p { margin: 0 0 5px; }
+.sources ul { display: flex; flex-wrap: wrap; list-style: none; padding: 0; margin: 0; gap: 4px 14px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+@media (max-width: 960px) {
+  .topic-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .layer-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .wrap { width: calc(100% - 26px); }
+  .hero { padding-block: 18px 16px; }
+  .overview { padding: 11px; }
+  .input-tracks { grid-template-columns: 1fr; gap: 6px; }
+  .main-row { --n: 1; gap: 13px; }
+  .main-row .flow-cell + .flow-cell::before { content: "↓"; top: -15px; left: 50%; translate: -50% 0; }
+  .main-row .node { min-height: 43px; }
+  .branch-notes { grid-template-columns: 1fr; gap: 5px; }
+  .detail-body { grid-template-columns: minmax(0, 1fr); padding: 11px; }
+  .principle-grid, .sink-layout { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 430px) {
+  .metrics div { padding-inline: 5px; }
+  .metrics dt { font-size: 10px; line-height: 1.25; }
+  .metrics dd { font-size: 15px; }
+  .track .node { padding: 5px; }
+  .track .node strong, .track .node small { font-size: 10px; }
+  .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .layer-groups, .lanes.parallel { grid-template-columns: minmax(0, 1fr); }
+  .layer-grid { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+  .layer small { font-size: 7px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap">
+    <div class="brand"><span class="mark" aria-hidden="true">⟷</span> 模型架构图</div>
+    <a href="#sources">来源与符号</a>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" aria-labelledby="title">
+    <p class="eyebrow">ARCHITECTURE / CHECKPOINT 1017</p>
+    <h1 id="title">DeepSeek V4.1 <span>Flash</span></h1>
+    <p>跟着图像与文本走一遍，从输入、40 层语言主干，到生成下一枚 token。</p>
+  </section>
+  <dl class="metrics">
+    <div><dt>语言主干</dt><dd>20 + 20 层</dd></div>
+    <div><dt>模型上下文</dt><dd>1,048,576</dd></div>
+    <div><dt>主干 + Engram 参数</dt><dd>552B + 196B</dd></div>
+    <div><dt>报告口径 · Prefill / Decode 激活</dt><dd>8B / 16B</dd></div>
+  </dl>
+  <section class="surface overview" id="overview" aria-labelledby="overview-title">
+    <div class="section-head">
+      <div><h2 id="overview-title">完整数据流 · 从输入到输出</h2><p>点击节点看计算顺序、张量 shape 和权重。虚线标出 cache 和提议支路。</p></div>
+      <div class="toggle" role="group" aria-label="运行阶段">
+        <button type="button" data-mode="prefill" aria-pressed="true">Prefill</button>
+        <button type="button" data-mode="decode" aria-pressed="false">Decode</button>
+      </div>
+    </div>
+    <div class="graph" aria-label="DeepSeek V4.1 Flash 端到端数据流">
+      <div class="input-tracks">
+        <section class="track"><h3>01 / TEXT</h3><div class="flow-row" id="text-track" style="--n:3"></div></section>
+        <section class="track vision"><h3>02 / VISION · 有图像时</h3><div class="flow-row" id="vision-track" style="--n:3"></div></section>
+      </div>
+      <div class="join" aria-hidden="true"><span>↓</span></div>
+      <div class="flow-row main-row" id="main-track"></div>
+      <div class="branch-notes">
+        <div class="branch"><span aria-hidden="true">⇢</span><div><button type="button" data-key="cache">全局 KV 支路</button><br>L19 输出 → L20 投影 → 全局 main KV + indexer K → L20–L39 共享。滑窗 KV 逐层写入。</div></div>
+        <div class="branch draft"><span aria-hidden="true">⇢</span><div><button type="button" data-key="draft">DSpark · 可选</button><br>Decoder 状态 → draft 提议 → 主模型验证 → 接受的 token 并入输出。</div></div>
+      </div>
+      <p class="mode-note" id="mode-note" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="explorer" id="explorer" aria-labelledby="explorer-title">
+    <div class="section-head">
+      <h2 id="explorer-title">逐步查看</h2>
+      <div class="toggle" role="group" aria-label="详情视图">
+        <button type="button" data-view="modules" aria-pressed="true">模块</button>
+        <button type="button" data-view="layers" aria-pressed="false">40 层地图</button>
+        <button type="button" data-view="tech" aria-pressed="false">技术详解</button>
+      </div>
+    </div>
+    <div id="layers" class="surface catalog" hidden></div>
+    <div id="tech" class="surface catalog" hidden></div>
+    <article class="surface inspect" id="detail" aria-labelledby="detail-title">
+      <header class="inspect-head"><p class="eyebrow" id="detail-tag"></p><h2 id="detail-title" tabindex="-1"></h2><p id="detail-intro"></p></header>
+      <div class="detail-body" id="detail-body"></div>
+    </article>
+    <p id="status" class="sr-only" role="status"></p>
+  </section>
+  <footer class="sources" id="sources">
+    <h2>来源与符号</h2>
+    <p>以 DeepSeek-V4.1-Flash-1017 的配置和官方参考 forward 为基础。权重名按官方参考实现的原始命名标注。CED 的 prefill / replay 路径采用技术报告的部署方案，backend 可以采用不同的融合、缓存格式和调度。</p>
+    <p><code>B</code> 是请求数，<code>S</code> 是本次输入位置数，<code>T</code> 是截至当前的上下文位置数，<code>G</code> 是已完成的全局 KV 条目数，<code>K</code> 是每个 query 的全局 TopK 槽数，<code>S′</code> 是计算 logits 的位置数。<code>N</code> 和 <code>M</code> 分别是单图合并前后的视觉位置数。单步 decode 常见 <code>S=1</code>。shape 均为逻辑 shape，Linear 矩阵按 [out, in] 标注。语言层号从 L00 起算。</p>
+    <ul id="source-list"></ul>
+  </footer>
+</main>
+<script>
+const checkpoint = "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017";
+const revision = "1bae0e1088993b9b82de08f59de5be5a34e42170";
+const snapshot = checkpoint + "/blob/" + revision;
+const report = "https://arxiv.org/html/2609.19969";
+const sources = {
+  config: ["1017 配置 · 1bae0e1", snapshot + "/config.json"],
+  report: ["DeepSeek 技术报告", report],
+  ced: ["报告 §2.2 · CED", report + "#S2.SS2"],
+  csa: ["报告 §2.3 · CSA2", report + "#S2.SS3"],
+  mhc: ["mHC 原始论文", "https://arxiv.org/html/2512.24880v2"],
+  singlePass: ["报告 §2.4.1 · Single-Pass mHC", report + "#S2.SS4.SSS1"],
+  sinkhorn: ["参考代码 · Sinkhorn kernel", snapshot + "/inference/kernel.py#L380"],
+  replay: ["报告 §3.2.2 · Bounded Replay", report + "#S3.SS2.SSS2"],
+  forward: ["官方参考 forward", snapshot + "/inference/model.py"],
+  kernel: ["官方稀疏 Attention kernel", snapshot + "/inference/kernel.py"],
+  vision: ["官方 ViT 与 Aligner", snapshot + "/inference/vision.py"],
+  encoding: ["官方输入编码", checkpoint + "/tree/" + revision + "/encoding"],
+  image: ["官方图像预处理", snapshot + "/inference/image_processor.py"],
+  weights: ["1017 checkpoint 文件", checkpoint + "/tree/main"],
+};
+const spec = {
+  layers: 40,
+  split: 20,
+  ratios: [0, 0, ...Array(18).fill(2), ...Array(20).fill(1)],
+  kv: [2, 8, 14, 20],
+  index: [2, 8, 14, 20, 24, 28, 32, 36],
+  engram: [1, 14],
+  candidates: 20,
+};
+const label = (i) => "L" + String(i).padStart(2, "0");
+const latest = (ids, i) => ids.findLast((source) => source <= i);
+function layerConfig(i) {
+  const ratio = spec.ratios[i];
+  const kv = ratio ? latest(spec.kv, i) : null;
+  const index = ratio ? latest(spec.index, i) : null;
+  const kind = !ratio ? "SWA" : kv === i ? "Full" : index === i ? "Reindex" : "Reuse";
+  return {i, ratio, kv, index, kind, engram: spec.engram.includes(i), encoder: i < spec.split};
+}
+
+const step = (title, shape, note, params = []) => ({title, shape, note, params});
+const lane = (title, ...steps) => ({title, steps});
+const chain = (...steps) => [[lane("", ...steps)]];
+const param = (name, shape) => [name, shape];
+const xShape = "[B, S, 5120]";
+const residualShape = "[B, S, 4, 5120]";
+const kvShape = "[B, G, 512]";
+const ixShape = "[B, G, 128]";
+const idsShape = "[B, S, K] · K ≤ 512";
+const rm = (name, d) => param(name + ".weight", "[" + d + "]");
+const linear = (name, out, input) => param(name + ".weight", "[" + out + ", " + input + "]");
+const embedding = linear("embed", 129280, 5120);
+const head = linear("head", 129280, 5120);
+const hNorm = rm("norm", 5120);
+
+const formatInputs = step("模板与 Tokenizer", "[B, S] · int IDs", "将角色、消息和控制标记串成模型输入。图文请求另保留图像 span 的位置与类型。");
+const embedTokens = step("Embedding lookup", xShape, "每个 token ID 读取 embedding table 的一行。", [embedding]);
+const expandStreams = step("初始化 4 路 mHC stream", residualShape, "复制 embedding 到四路 residual stream。首次 pre-mix 是 [1,0,0,0]。");
+const collapseStreams = step("最终 mHC collapse → RMSNorm", xShape, "用最后一个 FFN 产生的 pre-mix 把四路 residual 聚合成一路，再做 RMSNorm。", [hNorm]);
+const projectHead = step("LM head projection", "[B, S′, 129280]", "选取需要预测的 hidden states。每个位置乘 LM head 权重，得到词表 logits。参考生成在常规单步只取最后一个位置。", [head]);
+const sampleToken = step("从 logits 选 token", "[B] · 下一 token ID", "Temperature=0 时取 argmax。采样时按配置缩放 logits，再沿词表归一化并采样。");
+const nextText = step("Detokenize → 输出 / 回送", "文本片段 + token ID", "将已接受的 token 解码为文字。若继续生成，把新 ID 送回 embedding，同时保留已有 cache。");
+
+const qSteps = [
+  step("Q down-projection", "[B, S, 1280]", "从本层 attention 输入投影到低秩 query；这份 latent 会被主 Q 与有 indexer 的层共同使用。", [linear("attn.wq_a", 1280, 5120)]),
+  step("Q latent RMSNorm → Q up-projection", "[B, S, 64, 512]", "先归一化 1280 维 latent，再按每头 512 行展开 64 个主 query heads。", [rm("attn.q_norm", 1280), linear("attn.wq_b", 32768, 1280)]),
+  step("Q RoPE", "[B, S, 64, 512]", "旋转每头末 64 维，使用该 query 的绝对位置。"),
+];
+const localSteps = [
+  step("本层 SWA KV projection → RMSNorm", "[B, S, 512]", "直接从本层 attention 输入投影一条共享的 KV 向量。64 个主 Q heads 共用它。", [linear("attn.wkv", 512, 5120), rm("attn.kv_norm", 512)]),
+  step("RoPE → 写入本层 SWA cache", "[B, min(T,128), 512]", "旋转末 64 维。Decode 每步写当前 token，读取该 query 最近最多 128 个可见位置。"),
+];
+function compressorSteps(ratio, input) {
+  const project = step(ratio === 2 ? "KV 与 gate 两路 projection" : "Global KV projection", "[B, S, 512]" + (ratio === 2 ? " × 2" : ""),
+    "从" + input + "得到每 token 的 512 维 KV" + (ratio === 2 ? "与逐通道 gate logits。" : "。每个 token 对应一个条目。"),
+    ratio === 2 ? [linear("attn.compressor.wkv", 512, 5120), linear("attn.compressor.wgate", 512, 5120)] : [linear("attn.compressor.wkv", 512, 5120)]);
+  const normalize = step(ratio === 2 ? "两 token 加权池化 → RMSNorm" : "Global KV RMSNorm", kvShape,
+    ratio === 2 ? "相邻两个 token 分一组。对每个通道沿组内 token 轴做 Softmax，再加权求和。完整一组才产生条目。" : "逐 token 归一化，ratio 1 跳过池化与 gate。", [rm("attn.compressor.norm", 512)]);
+  return [project, normalize];
+}
+function globalLane(config) {
+  if (config.kv !== config.i) return lane("Global KV 支路", step("读取 " + label(config.kv) + " 的 main KV", kvShape,
+    "沿用该 Full 层写入的全局 KV。当前层仍从自身输入写独立的 SWA KV。"));
+  const input = config.encoder ? "本层 attention 输入" : "L19 结束后交给 L20 的状态（经 mHC pre-mix 与 attention norm）";
+  return lane("Global KV 支路", ...compressorSteps(config.ratio, input),
+    step("分流：main KV 与 indexer K", kvShape + " · " + ixShape,
+      "归一化后、RoPE 前的 512 维条目同时供两路读取。主 KV 旋转末 64 维后写入全局 cache。Indexer 的 K 走自己的 projection。"));
+}
+function indexStages(config) {
+  if (config.index !== config.i) return chain(step("读取 " + label(config.index) + " 选出的 TopK", idsShape,
+    "同一 forward 沿用行号。当前层用自己的主 query 重算主 attention。"));
+  const q = lane("Indexer Q",
+    step("Indexer Q up-projection → RoPE", "[B, S, 32, 128]", "从本层已经 RMSNorm 的 1280 维 query latent 投影。每头旋转末 64 维。", [linear("attn.indexer.wq_b", 4096, 1280)]));
+  const k = config.kv === config.i
+    ? lane("Indexer K", step("压缩 latent → K projection → RMSNorm", ixShape, "输入是主 compressor 的 512 维、RoPE 前 latent。将末 64 维旋转后写入 indexer K cache。", [linear("attn.indexer.wk", 128, 512), rm("attn.indexer.k_norm", 128)]))
+    : lane("Indexer K", step("读取 " + label(config.kv) + " 的 indexer K", ixShape, "直接读取来源 Full 层预先构建的 K。"));
+  const weights = lane("跨头系数",
+    step("Head-weight projection", "[B, S, 32]", "由本层 attention 输入为每个 query 产生一组系数。固定缩放 1/√128 与 1/√32 乘入系数，参考实现把它们和 ReLU 后的分数相乘。", [linear("attn.indexer.weights_proj", 32, 5120)]));
+  const search = config.i === spec.candidates
+    ? "对可见位置选本层 Top-512。并行按每 8 个位置的最大分数给 block 打分，选至多 2048 个 block，供后续 Reindex 使用。"
+    : config.kind === "Reindex"
+      ? "在 L20 候选池（最多 16,384 个位置）内排序，选本层 Top-512。后续三层复用本层选出的索引。"
+      : "在因果可见且已完成压缩的组中选至多 512 个位置。";
+  return [[q, k, weights], ...chain(
+    step("Indexer 点积 → ReLU → 跨头求和", "[B, S, G] · 逻辑分数", "每个 head 给位置打分，负分经 ReLU 归零，再用该 query 的跨头系数合成总分。"),
+    step("Causal mask → TopK", idsShape, search),
+  )];
+}
+
+function attentionFlow(config) {
+  const tracks = [lane("主 Q", ...qSteps), lane("Layer-local SWA KV", ...localSteps)];
+  if (config.ratio) {
+    tracks.push(globalLane(config));
+    const index = config.i === config.index
+      ? {...lane("Indexer · 决定全局行号", step("独立打分 → TopK", idsShape,
+        config.kind === "Reindex" ? "用本层 Q 与共享 K 重排 L20 候选池。" : "给可见全局条目打分并选出本层位置。")),
+        detail: indexStages(config), detailTitle: "展开 Indexer Q、K 和 head 权重"}
+      : lane("沿用全局行号", ...indexStages(config)[0][0].steps);
+    tracks.push(index);
+  }
+  const attn = step(config.ratio ? "SWA + 全局 TopK → 一次稀疏 attention" : "滑窗位置 → Attention", "[B, S, 64, 512]",
+    "用 1/√512 缩放 QK 点积，沿选中位置做 Softmax，结合每头的 attention sink。用这些系数汇总同一份 512 维 KV 向量。", [param("attn.attn_sink", "[64]")]);
+  return [
+    ...chain(step("mHC pre-mix → Attention RMSNorm", xShape, "把四路 residual 混成一路后归一化，给本层 attention 使用。", [rm("attn_norm", 5120)])),
+    tracks,
+    ...chain(
+      attn,
+      step("Inverse RoPE → 分组 output projection", "[B, S, 8, 1024] → " + xShape,
+        "用 query 位置的逆旋转还原输出末 64 维。64 个 head 分成 8 组，各组 8×512 → 1024，拼成 8192 后做第二次投影。", [
+          linear("attn.wo_a", 8192, 4096), linear("attn.wo_b", 5120, 8192),
+        ]),
+    ),
+  ];
+}
+const expertSteps = (scope) => [
+  step("Gate / Up projection → Clamped SwiGLU", "[B, S, 2304] · 每 expert",
+    "gate 上界取 10，up 限在 [−10,10]。SiLU(gate) × up 逐元素相乘。", [
+      linear(scope + ".w1", 2304, 5120), linear(scope + ".w3", 2304, 5120),
+    ]),
+  step("Down-projection", xShape, "将中间特征投影回 5120 维。", [linear(scope + ".w2", 5120, 2304)]),
+];
+const moeFlow = [
+  ...chain(step("FFN RMSNorm", xShape, "由 mHC pre-mix 合成一路 FFN 输入再归一化。", [rm("ffn_norm", 5120)])),
+  [
+    lane("Routed experts · Top-6",
+      step("Router projection → √softplus → Top-6", "[B, S, 384] → [B, S, 6]",
+        "对 logits 取 √softplus。用文本或图像的 correction bias 选 expert，按未加 bias 的入选分数归一化再乘 1.5。", [
+          linear("ffn.gate", 384, 5120), param("ffn.gate.bias / bias_vl", "各 [384]"),
+        ]), ...expertSteps("ffn.experts.{e}")),
+    lane("Shared expert · 每 token 执行", ...expertSteps("ffn.shared_experts")),
+  ],
+  ...chain(step("加权聚合", xShape, "累加六个 routed expert 的加权输出，再加 shared expert。mHC post 将结果分发回四路 residual。")),
+];
+const hcSteps = [
+  step("从 residual 算混合系数", "[B, S, 24] → 4 + 4 + 16",
+    "展平 4×5120，做 RMS 缩放与 projection。按 pre、post、4×4 residual mix 分块，对 residual mix 做 Sinkhorn。", [
+      param("hc_attn_fn / hc_ffn_fn", "各 [24, 20480]"),
+      param("hc_attn_base / hc_ffn_base", "各 [24]"),
+      param("hc_attn_scale / hc_ffn_scale", "各 [3]"),
+    ]),
+  step("用上一子层的 pre-mix → Attention 或 MoE", residualShape + " → " + xShape,
+    "当前 sublayer 的输入依赖上一 sublayer 已算好的 pre-mix。当前计算出的 pre-mix 留给下一次。"),
+  step("Post-mix + residual mix", residualShape, "把本次输出按 post 系数写回四路，并用 4×4 矩阵混合原 residual。"),
+];
+const patch = step("尺寸对齐 → Patchify", "[N, 588]", "图像预处理后取 14×14 的 RGB patch，每块展成 14×14×3=588 个数。");
+const stepImageEmbed = step("线性 Patch embedding", "[N, 1024]", "每个 patch 做一次 Linear。", [linear("vision.patch_embed.proj", 1024, 588), param("vision.patch_embed.proj.bias", "[1024]")]);
+const alignSteps = [
+  step("3×3 Pixel-unshuffle", "[M, 9216]", "把视觉网格补到 3 的倍数，再把相邻 9 个 patch 搬到同一个位置的通道轴。"),
+  step("Aligner Linear → GELU → Linear", "[M, 5120]", "先投影到语言宽度 5120，应用 GELU 后再做一次同宽投影。", [
+    linear("aligner.w1", 5120, 9216), param("aligner.w1.bias", "[5120]"),
+    linear("aligner.w2", 5120, 5120), param("aligner.w2.bias", "[5120]"),
+  ]),
+];
+const fillImage = step("填入图像 span", xShape,
+  "把视觉 embeddings 写进对应位置。图像开始、行分隔与结束位置有各自的 learned vector。", [
+    param("image_start / image_newline / image_end", "各 [5120]"),
+  ]);
+
+const encoderTail = step("Encoder → Decoder 接缝", residualShape, "L19 输出四路 residual 及 pre-mix。部署时可从所有 prompt 位置准备全局 KV，只将 prompt 尾部送进 Decoder 完整计算。");
+const replayDecoder = step("Decoder L20–L39", residualShape, "Prefill 部署策略 replay 最后最多 128 个 prompt 位置以建立逐层 SWA。Decode 的新位置经过全部 20 个 Decoder 层。");
+const exampleScope = "layers.2";
+const modules = {
+  messages: {
+    title: "文本消息", intro: "对话先编排成模型协议支持的序列，再进入 Tokenizer。",
+    input: "system / user / assistant 消息", output: "带角色与分隔符的 prompt",
+    flow: chain(step("组织文本与多模态段落", "消息 → prompt", "保留角色顺序。图文输入用独立 span 标记图像所在位置。"), formatInputs),
+    links: ["tokenize", "image"], refs: ["encoding", "image"],
+  },
+  tokenize: {
+    title: "Tokenizer", intro: "把文本转为整数 ID，同时保留图像 span 元数据。",
+    input: "格式化的文本与图像占位", output: "[B, S] · token IDs",
+    body: "例如两条请求各输入 4 个 token，prefill 的 IDs 是 [2, 4]。若下一次各送入 1 个新 token，decode 的 IDs 是 [2, 1]，而 cache 写入后每条请求已有 5 个位置。",
+    flow: chain(formatInputs), links: ["embed", "output"], refs: ["encoding", "config"],
+  },
+  embed: {
+    title: "Token embedding", intro: "每个 ID 读取一行 5120 维 embedding。",
+    input: "[B, S] · token IDs", output: xShape,
+    flow: chain(embedTokens), links: ["fusion", "logits"], refs: ["config", "forward", "weights"],
+  },
+  image: {
+    title: "图像预处理", intro: "将输入图像变成与视觉 patch 网格对齐的 RGB 像素，并记录图像 span。",
+    input: "单图 [H, W, 3]", output: "[N, 588] · 展平 patch",
+    flow: chain(patch), links: ["vision", "aligner"], refs: ["image", "vision", "config"],
+  },
+  vision: {
+    title: "DeepSeek-ViT", intro: "32 层双向视觉 Transformer 在单张图的 patch 之间建模。",
+    input: "[N, 588] · 单图 patches", output: "[N, 1024] · 视觉网格",
+    flow: chain(stepImageEmbed,
+      step("视觉 Attention × 32", "[N, 16, 64] → [N, 1024]",
+        "每层先做 RMSNorm。融合 QKV 投影分出三组，Q/K 加二维 RoPE，在图像内做双向 attention，投影后加 residual。", [
+          rm("vision.blocks.{v}.norm1", 1024), linear("vision.blocks.{v}.attn.wqkv", 3072, 1024), linear("vision.blocks.{v}.attn.wo", 1024, 1024),
+        ]),
+      step("每层的 SwiGLU → Residual", "[N, 2816] → [N, 1024]",
+        "每个视觉块的 attention 后做 Norm 和 SwiGLU。w1 的前后各 2816 行分别输出 gate 和 up。完成 32 个块后用最终 RMSNorm。", [
+          rm("vision.blocks.{v}.norm2", 1024), linear("vision.blocks.{v}.mlp.w1", 5632, 1024),
+          linear("vision.blocks.{v}.mlp.w2", 1024, 2816), rm("vision.norm", 1024),
+        ])),
+    body: "{v} 为视觉层号 0–31。Attention 与 FFN 在每个视觉块内交替执行。图像网格的行、列位置用于二维 RoPE。",
+    links: ["aligner", "rope"], refs: ["vision", "config", "report"],
+  },
+  aligner: {
+    title: "Pixel-unshuffle 与 Aligner", intro: "把 3×3 相邻视觉位置合在一起，再投影到语言主干的 5120 维。",
+    input: "[N, 1024] · ViT 输出", output: "[M, 5120] · visual embeddings",
+    flow: chain(...alignSteps), links: ["vision", "fusion"], refs: ["vision", "config"],
+  },
+  fusion: {
+    title: "图文合流与 mHC 初始化", intro: "图像 embeddings 写入图像 span，和文本一起形成语言模型的因果序列。",
+    input: "[B, S, 5120] + [M, 5120] · 可选图像", output: residualShape,
+    flow: chain(fillImage, expandStreams), links: ["encoder", "mhc", "engram"], refs: ["forward", "report"],
+  },
+  encoder: {
+    title: "Causal Encoder · L00–L19", intro: "新输入位置通过全部 20 层 Encoder，形成供 Decoder 使用的表示。",
+    input: residualShape, output: residualShape + " + Encoder KV",
+    body: "L00–L01 只有 SWA。L02、L08、L14 各写入一组 ratio 2 的全局 KV 和 indexer K，同时各自算 TopK。每组后五层共享这三种全局数据。40 层语言块的 FFN 都是 MoE。",
+    flow: chain(
+      step("L00–L01 · 滑窗与 MoE", residualShape, "各层按 128-token 窗口做 causal attention，L01 的 attention 前注入 Engram。"),
+      step("L02–L19 · 3 组 CSA2", residualShape + " + ratio-2 cache", "各组由一个 Full 层开头，接五个 Reuse 层。L14 在 attention 前也注入 Engram。"),
+      encoderTail,
+    ),
+    links: ["layer-0", "layer-2", "layer-3", "layer-14", "ced", "moe"], refs: ["config", "report", "forward"],
+  },
+  ced: {
+    title: "CED 接缝 · L19 → L20", intro: "同一个 Encoder 输出同时供全局 KV 准备与 Decoder 主干计算。",
+    input: "[B, S, 4, 5120] · Encoder 状态", output: "L20 全局 KV + Decoder 输入",
+    body: "这是报告里的部署路径。官方参考 forward 逐层处理输入，部署方案可把写全局 KV 和完整 Decoder 计算分开。Bounded Replay 对 prompt 尾部的重建是近似的。",
+    flow: [
+      ...chain(encoderTail),
+      [
+        lane("全局 KV · 所有新 prompt 位置", step("L20 Global KV projection", "[B, S, 512] · ratio 1",
+          "从 L19 输出得到 L20 的 attention 输入。用 L20 compressor 逐位置投影、归一化，再写 main KV 与 indexer K。", [
+            linear("layers.20.attn.compressor.wkv", 512, 5120), rm("layers.20.attn.compressor.norm", 512),
+            linear("layers.20.attn.indexer.wk", 128, 512),
+          ])),
+        lane("完整 Decoder · Prefill 尾部", step("取最后最多 128 个 prompt 位置", "[B, min(T,128), 4, 5120]",
+          "部署时让尾部走 L20–L39，补齐各层 SWA cache。进入 decode 后，每个新 token 都经过 Encoder 和 Decoder。")),
+      ],
+    ],
+    links: ["layer-19", "layer-20", "decoder", "cache"], refs: ["ced", "replay", "forward"],
+  },
+  decoder: {
+    title: "Decoder · L20–L39", intro: "每个 decode 新 token 走完整 Decoder。逐层做本地 SWA，并读取共享全局条目。",
+    input: residualShape + " + L20 全局 cache", output: residualShape,
+    body: "20 层可看成五组，每组四层。L20 为 Full，L24、L28、L32、L36 为 Reindex，其余为 Reuse。所有 Decoder 层使用 L20 的 global KV / indexer K。每个 query 的最终 TopK 可在四层组之间变化。",
+    flow: chain(
+      step("L20 · Full + 候选池", idsShape + " + ≤16,384 候选",
+        "同时选自己的 Top-512，并按 8 位置一组的最大分数选至多 2048 个 block。后续索引层用这个池限制搜索范围。"),
+      step("L24 / 28 / 32 / 36 · Reindex", idsShape,
+        "使用当前层的 query 和共享 indexer K，在候选池内选新 Top-512。每组后面的三层沿用行号。"),
+      replayDecoder,
+    ),
+    links: ["layer-20", "layer-24", "layer-25", "indexer", "logits"], refs: ["config", "csa", "replay"],
+  },
+  logits: {
+    title: "Final Norm 与 LM head", intro: "从四路 residual 聚合回 5120 维，再投影到 129,280 项词表。",
+    input: residualShape, output: "[B, S′, 129280] · logits",
+    flow: chain(collapseStreams, projectHead), links: ["mhc", "output"], refs: ["config", "forward", "weights"],
+  },
+  output: {
+    title: "采样、解码与生成循环", intro: "用 logits 选下一个 ID，把接受的 token 解码为文本。",
+    input: "[B, 129280] · 当前预测位置 logits", output: "下一 token ID [B] 与文本",
+    body: "例如 prefill 处理完四个 token，从末位置 logits 取第一个新 ID。下一次 decode 只送进这个 ID，并使用此前的 cache。重复到 EOS 或生成长度限制。",
+    flow: chain(sampleToken, nextText), links: ["tokenize", "logits", "draft"], refs: ["forward", "config"],
+  },
+  attention: {
+    title: "主 Attention · SWA + CSA2", intro: "对每个 query，将滑窗位置和全局 TopK 放到同一次 attention 里汇总。",
+    input: residualShape + " + 本层 SWA / 可用全局 cache", output: xShape + " · Attention 更新",
+    body: "以下用 L02 Full 作例子。这里 G 是完成的全局组数，ratio 2 下为 floor(T/2)。图按逻辑依赖排列，cache 物理格式由后端决定。",
+    scope: exampleScope, flow: attentionFlow(layerConfig(2)), links: ["layer-0", "layer-20", "layer-24", "indexer", "cache", "rope"], refs: ["forward", "csa"],
+  },
+  swa: {
+    title: "Sliding Window Attention", intro: "每层用自己的 hidden states 写本层滑窗 cache。",
+    input: xShape, output: "[B, min(T,128), 512] · decode cache",
+    body: "例如 query 的 0-based 位置是 199，普通滑窗能读 72–199。Bounded Replay 截断到 replay 起点，索引器选出的全局位置仍按自己的可见规则读取。",
+    scope: exampleScope, flow: chain(...localSteps), links: ["layer-0", "ced", "cache"], refs: ["forward", "replay"],
+  },
+  compressor: {
+    title: "CSA2 Compressor", intro: "Full 层产出全局条目。Encoder 的 Full 层每两 token 池化，Decoder 的 L20 每 token 保留一个条目。",
+    input: xShape, output: kvShape + " · RoPE 前",
+    body: "举例，一个通道上两 token 的投影值为 2 和 6，gate logits 同为 0，则该通道池化结果为 4，再进入 RMSNorm。未凑齐的一组留待后续 token。",
+    scope: exampleScope, flow: [ [globalLane(layerConfig(2)), lane("Ratio 1 · L20",
+      step("逐 token 投影 → RMSNorm", "[B, S, 512]", "L20 从 Encoder 末层对应输入产生全局条目。每个 token 一条，仍会走后续 RoPE 和 cache 写入。", [
+        linear("/layers.20.attn.compressor.wkv", 512, 5120), rm("/layers.20.attn.compressor.norm", 512),
+      ]))] ],
+    links: ["layer-2", "layer-20", "indexer"], refs: ["csa", "forward"],
+  },
+  indexer: {
+    title: "Hierarchical Sparse Indexer", intro: "Indexer 只决定主 attention 读哪些全局行。L20 建候选池，后面四个 Reindex 层各自重排。",
+    input: "[B, S, 1280] · query latent + " + ixShape + " · indexer K", output: idsShape,
+    body: "以 L20 为例，自己的 Top-512 直接给本层主 attention。共享候选池另按 block 最大分数选出，2,048×8 给出 16,384 个位置上限。Head 系数每个 query 算一组，供它的所有候选位置共享，可以带符号。",
+    scope: "layers.20", flow: indexStages(layerConfig(20)),
+    links: ["layer-20", "layer-24", "layer-25", "cache", "math"], refs: ["config", "csa", "forward"],
+  },
+  cache: {
+    title: "Cache 与跨层复用", intro: "把缓存向量、TopK 行号和候选范围分开，就能跟清 Full、Reindex、Reuse。",
+    input: "Full 层的全局条目与 Indexer 输出", output: "各层本次 query 所需的 KV 和行号",
+    body: "例如 L25 的全局 main KV 和 indexer K 来源是 L20，TopK 来自 L24。L25 无独立 Indexer 计算，只把 L24 行号用于自己的主 attention。L25 的 SWA cache 仍由 L25 写入。",
+    flow: [[
+      lane("跨 token · 层内", step("本层 SWA cache", "[B, min(T,128), 512]", "每个语言层各有自己的最近窗口。")),
+      lane("跨层 · 长期状态", step("Global main KV 与 indexer K", kvShape + " / " + ixShape, "仅 L02、08、14、20 写各自的全局表，组内消费层读取它。")),
+      lane("同一 forward · 每 query", step("最终 TopK 行号", idsShape, "Full 或 Reindex 重算，之后的 Reuse 层读上一次选址。")),
+      lane("同一 forward · Decoder", step("L20 候选池", "≤2048 个 block × 8", "四个后续 Reindex 层共用搜索范围。各层最终选中的行号可不同。")),
+    ]],
+    links: ["ced", "layer-20", "layer-24", "layer-25", "swa"], refs: ["config", "csa", "replay", "forward"],
+  },
+  mhc: {
+    title: "Single-Pass mHC", intro: "mHC 让四路 residual 在层间交换信息。每个 Attention 或 FFN 子层仍只接收一条 5120 维混合输入。",
+    input: residualShape, output: residualShape,
+    body: "先用 pre-mix 从四路取信息，再用 post-mix 写入子层更新。原来的四路由 4×4 residual mix 重新分配。Single-Pass 把 pre-mix 提前到上一子层计算。",
+    scope: exampleScope,
+    flow: [
+      [lane("子层计算 · 用已有的 pre", hcSteps[1]), lane("并行预测 · 当前 post / comb 与下一个 pre", hcSteps[0])],
+      ...chain(hcSteps[2]),
+    ],
+    links: ["fusion", "layer-2", "moe", "logits"], refs: ["mhc", "singlePass", "sinkhorn", "forward"],
+  },
+  moe: {
+    title: "DeepSeekMoE · 384 选 6", intro: "Router 为每个 token 选 6 个 routed experts，shared expert 总是执行。",
+    input: xShape, output: xShape,
+    body: "图像与文本各有一个 router correction bias。bias 影响专家名次，入选权重从原始 √softplus 分数归一化后再乘 1.5。{e} 表示选出的 expert ID。",
+    scope: exampleScope, flow: moeFlow, links: ["mhc", "layer-2", "math"], refs: ["config", "report", "forward"],
+  },
+  engram: {
+    title: "Engram · L01 与 L14", intro: "用当前 token 及其文本前缀的 n-gram 取出记忆，再按上下文门控写回 residual。",
+    input: "[B, S] · token IDs + " + residualShape, output: residualShape,
+    body: "这里的 Engram 是可训练的 embedding table。语言主干使用两套表，索引来自 2、3、4-gram 的确定性哈希。图像位置由 mask 跳过此注入。",
+    scope: "layers.1",
+    flow: chain(
+      step("Token ID 压缩 → n-gram hash", "[B, S, 24] · 行号", "3 种 n-gram 长度 × 8 个哈希头，从文本前缀确定查表行。"),
+      step("Engram lookup → K/V projection", "[B, S, 24, 256] → [B, S, 25600]",
+        "拼成 6144 维，投影得到四路 key 与一个共享 value。", [
+          param("engram.embed.weight", "[384006168, 256]"), linear("engram.wkv", 25600, 6144),
+        ]),
+      step("相关性 Gate → 写回 residual", residualShape,
+        "每条 residual 与自己的 key 求归一化点积，经 signed square root 和 sigmoid 得到 gate，再加上 gate × 共享 value。", [
+          param("engram.q_weight / engram.k_weight", "各 [4, 5120]"),
+        ]),
+    ),
+    links: ["layer-1", "layer-14", "mhc"], refs: ["config", "report", "forward"],
+  },
+  draft: {
+    title: "DSpark · 可选推理加速", intro: "用目标模型的上下文提议最多五个新 token，再由主模型验证。",
+    input: "L37–L39 的 3 路状态 + anchor token", output: "[B, ≤5] · 候选 ID（验证前）",
+    body: "三个 draft block 各有 128 个 routed experts，每 token 选 3 个。可用性和验证长度取决于部署后端。主数据流展示标准自回归，提议支路把验证通过的 token 并入输出。",
+    flow: chain(
+      step("Target taps → Context projection", "[B, S, 15360] → " + xShape,
+        "取 L37–L39 的 block 输入 residual 的 stream 均值并拼接。投影与 RMSNorm 后用于给三层 drafter 写各自的滑窗 KV。", [
+          linear("mtp.0.main_proj", 5120, 15360), rm("mtp.0.main_norm", 5120),
+        ]),
+      step("Anchor + 4 noise slots → 3 层 Draft", "[B, 5, 5120] → [B, 5, 129280]",
+        "五个槽在 draft blocks 中并行算基础 logits，输入 embedding 和词表输出头与主模型共享。", [embedding, head]),
+      step("Markov 修正 → Confidence → 验证", "[B, 5] · 候选与置信分数",
+        "每个槽用前一个 token 的 256 维 Markov embedding 修正 logits。置信头预测接受可能性，主模型验证候选前缀。", [
+          linear("mtp.2.markov_head.embed", 129280, 256),
+          linear("mtp.2.markov_head.head", 129280, 256),
+          linear("mtp.2.confidence_head.proj", 1, 5376),
+        ]),
+    ),
+    links: ["decoder", "output"], refs: ["config", "report", "forward"],
+  },
+  rope: {
+    title: "Partial RoPE 与 Inverse RoPE", intro: "主 Q、KV 和 Indexer 旋转各自的末 64 维。Attention 输出在投影前逆转一次。",
+    input: "Q / KV / indexer QK + position IDs", output: "各自原 shape",
+    body: "Partial RoPE 表示取多少维，interleaved 表示怎么配对。选中的 64 维按相邻维组成 32 对。文本 SWA-only 层用 θ=10,000 的普通 RoPE，带全局分支的层用 θ=160,000 的 YaRN 频率。视觉塔另用 2D RoPE。",
+    flow: chain(
+      step("频率 × 位置 → 角度", "32 对 · 每位置", "全局压缩组用组内第一 token 的位置作旋转位置，直到该组完成才可见。"),
+      step("Interleaved rotation", "维度不变", "每对 (a,b) 旋转为 (a cosθ − b sinθ, a sinθ + b cosθ)。"),
+      step("Attention 输出末 64 维 → Inverse RoPE", "[B, S, 64, 512]", "以 query 位置使用负角度旋转。再进入 wo_a 和 wo_b。"),
+    ),
+    links: ["vision", "attention", "indexer"], refs: ["config", "forward", "vision"],
+  },
+  math: {
+    title: "Softmax、ReLU 与 RMSNorm", intro: "这些算子都在具体轴上工作。跟着 shape 看它们各自控制什么。",
+    input: "scores、head 向量或 residual", output: "各计算路径中的归一化或门控张量",
+    flow: [[
+      lane("主 Attention · Softmax",
+        step("对选中位置归一化", "[B, S, 64, ≤640] · 逻辑", "对每个 query/head 计算 exp(zᵢ) / (∑exp(zⱼ) + exp(sinkₕ))。sink 增加分母，相当于多一个 value 为零的槽。比如两个分数与 sink 都为 0，每个真实槽的权重是 1/3。")),
+      lane("Indexer · ReLU",
+        step("逐元素 max(0,z)", "[B, S, 32, G]", "例如头内分数 [−2, 3] 经 ReLU 变成 [0, 3]，随后才乘跨头系数。")),
+      lane("RMSNorm",
+        step("沿最后一维定尺度", "shape 不变", "RMSNorm(x)=γ ⊙ x / √(mean(x²)+ε)。例如 γ=1、ε 近似 0 时，[3,4] 会除以 √12.5。")),
+      lane("MoE · SwiGLU",
+        step("门控乘法", "[B, S, 2304] · 每 expert", "SiLU(x)=x·sigmoid(x)。对 clamp 后的 gate 应用 SiLU，再和 up 分支逐元素相乘。")),
+    ]],
+    links: ["attention", "indexer", "compressor", "moe"], refs: ["forward", "kernel"],
+  },
+};
+
+function describeLayer(i) {
+  const config = layerConfig(i);
+  const part = config.encoder ? "Encoder" : "Decoder";
+  const sharing = !config.ratio
+    ? "只读取本层 SWA cache。"
+    : config.kind === "Full"
+      ? "本层写全局 main KV / indexer K 并计算 TopK。" + (i === spec.candidates ? "它也为后续 Decoder 层建立候选池。" : "")
+      : "全局 main KV / indexer K 取自 " + label(config.kv) + "。" +
+        (config.kind === "Reindex" ? "本层在 L20 候选池中选出自己的 TopK。" : "TopK 行号沿用 " + label(config.index) + "。");
+  const links = ["attention", "moe", "mhc"];
+  if (config.engram) links.push("engram");
+  if (config.ratio) links.push("cache", "indexer");
+  for (const source of new Set([config.kv, config.index])) {
+    if (source !== null && source !== i) links.push("layer-" + source);
+  }
+  const start = [];
+  if (config.engram) {
+    const rows = i === 1 ? 384006168 : 384016682;
+    start.push(step("Engram → 注入 residual", residualShape, "按当前文本 token 的 n-gram 行号查表，经门控写入四路 residual。", [
+      param("engram.embed.weight", "[" + rows + ", 256]"), linear("engram.wkv", 25600, 6144),
+    ]));
+  }
+  start.push(hcSteps[0]);
+  return {
+    title: label(i) + " · " + part + " · " + config.kind,
+    intro: sharing + (config.engram ? " 此层在 attention 前注入 Engram。" : ""),
+    input: residualShape + (config.ratio ? " + 全局来源层状态" : ""),
+    output: residualShape + (config.kind === "Full" ? " + Global KV / Indexer K / TopK" : config.kind === "Reindex" ? " + 新 TopK" : ""),
+    body: "本层 SWA 窗口为 128，FFN 使用 6 个 routed experts 和 1 个 shared expert。" +
+      (config.ratio ? " Global KV ratio = " + config.ratio + "，与每个位置的向量维度独立。" : ""),
+    scope: "layers." + i,
+    flow: [
+      ...chain(...start),
+      [{
+        ...lane("Attention", step("混合 → Attention → Post-mix", residualShape, "用上一 sublayer 的 pre-mix 生成 attention 输入，再将本层 attention 更新与原 residual 混合。")),
+        detail: attentionFlow(config), detailTitle: "逐步查看本层 Attention", open: true,
+      }],
+      [{
+        ...lane("FFN", step("混合 → MoE → Post-mix", residualShape, "使用当前 attention 算出的 pre-mix，执行 MoE，再混合回四路并传给下一层。")),
+        detail: moeFlow, detailTitle: "逐步查看本层 MoE",
+      }],
+    ],
+    links, refs: ["config", "forward", "csa"],
+  };
+}
+
+const principles = {
+  mhc: [
+    ["01 · 四路 residual 怎么走", `
+      <p>普通 residual 是 <code>x′ = x + F(x)</code>，一路状态往下传。mHC 把同一 token 的状态扩成四路，每路 5120 维。Embedding 一开始复制四份，之后每个子层都可以从不同的路读、向不同的路写。</p>
+      <code class="equation">u = Σᵢ preᵢ · Xᵢ　→　Y = F(Norm(u))<br>X′ⱼ = Σᵢ comb[i,j] · Xᵢ + postⱼ · Y</code>
+      <p><code>F</code> 是一次 Attention 或 MoE。<code>pre</code> 决定送进去的混合输入，<code>post</code> 决定子层的新结果怎样写回四路，<code>comb</code> 决定原来的四路怎样重分配。这里按参考代码的矩阵下标写，行是来源，列是去向。</p>`],
+    ["02 · 每个 token 怎样算出 24 个系数", `
+      <p>先把这个 token 的四路展成 20,480 维。<code>hc_attn_fn</code> 或 <code>hc_ffn_fn</code> 各是 <code>[24, 20480]</code>。投影后乘输入的逆 RMS。再按 <strong>4 个 pre、4 个 post、16 个 comb logits</strong> 分组，各自乘 scale、加 base。</p>
+      <code class="equation">pre = sigmoid(pre logits) + ε<br>post = 2 × sigmoid(post logits)<br>comb = Sinkhorn(4×4 comb logits)</code>
+      <p>pre 和 post 的总和可随 token 变化。行和列的归一化约束只加在 comb 上。Attention 和 FFN 各自有一套学习到的投影参数。</p>`],
+    ["03 · 为什么给 residual mix 加约束", `
+      <p>如果允许旧 residual 任意混合，比如每层都乘 <code>1.2I</code>，重复 20 次，旧信号就会放大约 38 倍。mHC 把 <code>comb</code> 限制到<strong>双随机矩阵</strong>附近，即元素非负、每行和与每列和都约为 1。</p>
+      <p>每行和为 1，使某一路旧状态分给四路的总份额为 1。每列和为 1，使每路新状态的旧信号部分是凸组合。理想约束下，旧 residual 的逐特征总和保持，反复相乘也保持双随机。子层仍能通过 <code>post × Y</code> 加入新信息。</p>
+      <p>参考 kernel 先沿行做 Softmax 得到正数，再交替缩放列和行。1017 配置使用 20 轮，得到近似双随机矩阵。</p>`],
+    ["04 · Single-Pass 为什么能少读一次", `
+      <p>普通 mHC 先扫一遍当前 <code>X</code> 才能算出当前 <code>pre</code>，再用这个系数读取 <code>X</code> 做混合。V4.1 在每个子层用<strong>上一子层已经算好的 pre</strong>，同时用当前 <code>X</code> 算出给下一子层的 pre。当前 post 和 comb 仍用于当前更新。</p>
+      <code class="equation">上层 pre → 本层 Attention → Attention 预测的 pre → 本层 FFN → FFN 预测的 pre → 下一层 Attention</code>
+      <p>部署版 Mega-mHC 可以每读到一块 residual，就同时做输入混合和系数投影的累加。报告的显存流量减半指这段 mHC 边界相对原多 kernel 实现。第一层用 <code>[1,0,0,0]</code> 起步，最后用最后一个 FFN 传出的 pre 聚合给 LM head。</p>`],
+    ["用两路手算一次读、混、写", `
+      <p>把每路缩成一个数 <code>X = [2,6]</code>。上一子层给 <code>pre = [0.75,0.25]</code>，读出 <code>u = 3</code>。设子层最终输出 <code>Y = 1</code>。</p>
+      <code class="equation">comb = [[0.7,0.3],[0.3,0.7]]　→　旧信号 [3.2,4.8]<br>post = [1,0.5]　→　新更新 [1,0.5]<br>X′ = [4.2,5.3]</code>
+      <p>原来的 <code>2 + 6 = 8</code> 经 comb 仍为 <code>3.2 + 4.8 = 8</code>。后面的变化来自子层更新。这组系数是教学值，实际每个 token 的系数都由模型预测。</p>`],
+  ],
+  indexer: [
+    ["两次 TopK 各选什么", `
+      <p><strong>L20</strong> 从全前缀的可见条目选自己的 Top‑512。它同时用<strong>每个 block 内最高的分数</strong>给 block 排序，选出更大的候选池。L24、L28、L32、L36 用各自的 query 重排这个池。</p>
+      <p>Decoder 的全局 cache 是 ratio 1。每组 8 个位置，最多取 2,048 个 block。对长上下文，能稀疏打分的实现只需在至多 16,384 个候选中搜索。官方参考代码展示的是先算分、再用候选 mask 筛掉池外条目。</p>`],
+    ["用三个 block 看候选池如何保留选择空间", `
+      <table class="example-table">
+        <thead><tr><th scope="col">Block</th><th scope="col">L20 的条目分数</th><th scope="col">Block 最大分</th></tr></thead>
+        <tbody><tr><th scope="row">A</th><td>0.1、0.9</td><td>0.9</td></tr>
+        <tr><th scope="row">B</th><td>0.7、0.6</td><td>0.7</td></tr>
+        <tr><th scope="row">C</th><td>0.2、0.8</td><td>0.8</td></tr></tbody>
+      </table>
+      <p>若选两个 block，候选池包含 A、C 的四个位置。L20 自己的 Top‑1 是 A 的第二个位置。L24 可以用自己的 Q 把 C 的第一个位置排到首位。下一层 L25 再沿用 L24 的结果。</p>`],
+  ],
+  engram: [
+    ["查哪一行，由文本 token 的短历史决定", `
+      <p>假设四个连续 token 是「我 / 查 / 天气 / 预报」。算到「预报」时，2、3、4‑gram 分别是「天气预报」「查天气预报」「我查天气预报」。模型先用压缩后的 token ID 表示它们，再用每种长度的 8 个哈希头取表，合计 24 行，每行 256 维。</p>
+      <p>地址只依赖当前及此前 token。运行时可以提前准备查表结果。查到的内容是否写回，仍由当前位置的 residual 决定。</p>`],
+    ["查表结果怎样写回四路", `
+      <p>把查出的 24 个向量拼成 6144 维，<code>engram.wkv</code> 生成四个 key 和一个共享 value。每路 residual 和自己的 key 算归一化点积分数，再求 <code>sigmoid(sign(s) × √|s|)</code>。参考实现对根号输入加了数值下限。</p>
+      <p>假设两路的分数分别是 4 和 −4，它们的 gate 约为 0.88 和 0.12。两路加回的是同一个 value，但使用不同的比例。图像位置的 gate 由 mask 置为 0。</p>`],
+  ],
+};
+
+const sinkhornDemo = `<section class="sink-demo" aria-labelledby="sink-title">
+  <h4 id="sink-title">试一试 · 4×4 residual mix 怎样变平衡</h4>
+  <div class="sink-layout">
+    <div>
+      <p>把四路的一维特征设成 <code>[2,4,6,8]</code>。从一个正矩阵起步，每轮先除以各行的和，再除以各列的和。行是来源，列是去向。</p>
+      <label class="sink-controls">行列归一化轮数 <output id="sink-iterations"></output>
+        <input id="sink-range" type="range" min="0" max="20" step="1" aria-describedby="sink-summary">
+      </label>
+      <p class="sink-readout" id="sink-summary" aria-live="polite"></p>
+      <p>演示只看旧 residual 的混合，模型 kernel 另有 ε 稳定项。</p>
+    </div>
+    <table class="matrix">
+      <caption>教学矩阵 · 行和与列和</caption>
+      <thead><tr><th scope="col">来源</th><th scope="col">去向 1</th><th scope="col">去向 2</th><th scope="col">去向 3</th><th scope="col">去向 4</th><th scope="col">行和</th></tr></thead>
+      <tbody id="sink-matrix"></tbody>
+      <tfoot id="sink-sums"></tfoot>
+    </table>
+  </div>
+</section>`;
+
+const topicKeys = ["attention", "ced", "swa", "compressor", "indexer", "cache", "rope", "mhc", "moe", "engram", "draft", "math"];
+const state = {mode: "prefill", view: "modules", selections: {modules: "ced", layers: "layer-0", tech: "attention"}, sinkhornIterations: 0};
+const $ = (id) => document.getElementById(id);
+const escape = (value) => String(value).replace(/[&<>"']/g, (char) => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"})[char]);
+const linkTo = (key) => {
+  const [title, url] = sources[key];
+  return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + title + ' ↗</a>';
+};
+const node = (key, title, sub, tone = "") => '<button type="button" class="node" data-key="' + key
+  + '" data-tone="' + tone + '" aria-pressed="false" aria-controls="detail"><strong>'
+  + escape(title) + '</strong><small>' + escape(sub) + '</small></button>';
+const row = (cells) => cells.map((cell) => '<div class="flow-cell">' + node(...cell) + '</div>').join("");
+
+function renderPrinciples(key) {
+  const cards = principles[key];
+  if (!cards) return "";
+  return '<section class="principles" id="principles" aria-labelledby="principles-title">'
+    + '<h3 id="principles-title">技术原理与示例</h3><div class="principle-grid">'
+    + cards.map(([title, body]) => '<article class="principle-card"><h4>' + escape(title) + '</h4>' + body + '</article>').join("")
+    + '</div>' + (key === "mhc" ? sinkhornDemo : "") + '</section>';
+}
+
+function setupSinkhorn() {
+  const slider = $("sink-range");
+  const sum = (values) => values.reduce((total, value) => total + value, 0);
+  const column = (matrix, j) => matrix.map((row) => row[j]);
+  const fixed = (value) => value.toFixed(3);
+  const streams = [2, 4, 6, 8];
+  function update() {
+    const rounds = slider.valueAsNumber;
+    state.sinkhornIterations = rounds;
+    const matrix = [[8, 2, 1, 1], [2, 5, 2, 1], [4, 1, 1, 3], [1, 1, 2, 6]];
+    for (let round = 0; round < rounds; round += 1) {
+      for (const row of matrix) {
+        const total = sum(row);
+        row.forEach((value, j) => { row[j] = value / total; });
+      }
+      for (let j = 0; j < streams.length; j += 1) {
+        const total = sum(column(matrix, j));
+        for (const row of matrix) row[j] /= total;
+      }
+    }
+    const rowSums = matrix.map(sum);
+    const colSums = streams.map((_, j) => sum(column(matrix, j)));
+    const mixed = streams.map((_, j) => sum(matrix.map((row, i) => streams[i] * row[j])));
+    const peak = Math.max(...matrix.flat());
+    $("sink-iterations").value = rounds + " / 20";
+    $("sink-summary").textContent = "旧信号混合后 [" + mixed.map(fixed).join(", ") + "]，合计 " + fixed(sum(mixed)) + "。输入合计 20。";
+    $("sink-matrix").innerHTML = matrix.map((row, i) => '<tr><th scope="row">' + (i + 1) + '</th>'
+      + row.map((value) => '<td style="--tint:' + (0.05 + 0.19 * value / peak) + '">' + fixed(value) + '</td>').join("")
+      + '<td class="sum" data-row-sum="' + rowSums[i] + '">' + fixed(rowSums[i]) + '</td></tr>').join("");
+    $("sink-sums").innerHTML = '<tr><th scope="row">列和</th>'
+      + colSums.map((value) => '<td class="sum" data-col-sum="' + value + '">' + fixed(value) + '</td>').join("")
+      + '<td>—</td></tr>';
+  }
+  slider.value = state.sinkhornIterations;
+  slider.addEventListener("input", update);
+  update();
+}
+
+function renderOverview() {
+  const prefill = state.mode === "prefill";
+  $("text-track").innerHTML = row([
+    ["messages", prefill ? "文本消息" : "上一步生成的 ID", prefill ? "对话与控制标记" : "[B, 1]"],
+    ["tokenize", prefill ? "Tokenizer" : "已编码 token", prefill ? "[B, S] · IDs" : "S = 1 · 单步例"],
+    ["embed", "Embedding", prefill ? "[B, S, 5120]" : "[B, 1, 5120]"],
+  ]);
+  $("vision-track").innerHTML = row([
+    ["image", "图像 → Patches", "14×14 · [N, 588]", "vision"],
+    ["vision", "DeepSeek-ViT ×32", "[N, 1024]", "vision"],
+    ["aligner", "3×3 合并 → Aligner", "[M, 5120]", "vision"],
+  ]);
+  $("main-track").innerHTML = row([
+    ["fusion", prefill ? "图文合流 → mHC" : "新 token → mHC", prefill ? "[B, S, 4, 5120]" : "[B, 1, 4, 5120]", "core"],
+    ["encoder", "Causal Encoder ×20", prefill ? "SWA → CSA2 · Engram ×2" : "新 token · L00–19", "core"],
+    ["ced", "CED 接缝", prefill ? "全局 KV + 尾部 replay" : "追加 L20 全局 KV", "core"],
+    ["decoder", "Decoder ×20", prefill ? "CSA2 + SWA · 尾部 ≤128" : "CSA2 + SWA · 新 token", "core"],
+    ["logits", "Final Norm → LM head", "[B, S′, 129280]", "output"],
+    ["output", "采样 → 输出", "文本 / 下一 token ID", "output"],
+  ]);
+  document.querySelector(".track.vision").classList.toggle("historical", !prefill);
+  document.querySelector(".track.vision h3").textContent = prefill ? "02 / VISION · 有图像时" : "02 / VISION · 已在 PREFILL 处理";
+  document.querySelector(".join").classList.toggle("single", !prefill);
+  $("mode-note").textContent = prefill
+    ? "Prefill · 图文 prompt 进入 Encoder。部署版为全部位置准备 Decoder 全局 KV，只 replay prompt 尾部来补齐 Decoder SWA。"
+    : "Decode · 单步把上一步生成的 ID 送回主干，逐层追加 cache。采样后生成的新 ID 再回到左侧，直到 EOS 或长度限制。";
+  for (const button of document.querySelectorAll("[data-mode]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.mode === state.mode));
+  }
+}
+function renderLayers() {
+  const groups = [["Causal Encoder · L00–L19", 0], ["Decoder · L20–L39", spec.split]];
+  $("layers").innerHTML = '<p class="layer-legend">SWA · 仅滑窗　Full · 写全局 KV 和 TopK　Reindex · 只重算 TopK　Reuse · 沿用全局 KV 与 TopK　◆ · Engram</p>'
+    + '<div class="layer-groups">' + groups.map(([title, start]) => {
+      const tiles = Array.from({length: spec.layers / 2}, (_, n) => {
+        const {i, kind, engram} = layerConfig(start + n);
+        return '<button type="button" class="layer" data-key="layer-' + i + '" data-kind="' + kind
+          + '" aria-controls="detail" aria-pressed="false" aria-label="' + label(i) + ' ' + kind + (engram ? ' Engram' : '')
+          + '">' + label(i) + '<small>' + (kind === "Reindex" ? "Reidx" : kind) + (engram ? ' ◆' : '') + '</small></button>';
+      }).join("");
+      return '<section class="layer-group"><h3>' + title + '</h3><div class="layer-grid">' + tiles + '</div></section>';
+    }).join("") + '</div>';
+}
+function renderFlow(phases, scope) {
+  return phases.map((lanes) => {
+    const columns = lanes.map(({title, steps, detail, detailTitle, open}, i) => {
+      const cards = steps.map(({title, shape, note, params}) => {
+        const weights = params.map(([path, shape]) => {
+          const name = path.replace(/^\//, "");
+          const full = scope && !path.startsWith("/") ? scope + "." + name : name;
+          return '<div><code title="' + escape(full) + '">' + escape(name) + '</code> <span>' + escape(shape) + '</span></div>';
+        }).join("");
+        return '<li class="step"><strong>' + escape(title) + '</strong><code>' + escape(shape) + '</code><p>'
+          + escape(note) + '</p>' + (weights ? '<div class="params">' + weights + '</div>' : '') + '</li>';
+      }).join("");
+      return '<div class="lane' + (lanes.length % 2 && i === lanes.length - 1 ? ' wide' : '') + '">'
+        + (title ? '<h4>' + escape(title) + '</h4>' : '') + '<ol class="steps">' + cards + '</ol>'
+        + (detail ? '<details class="more"' + (open ? ' open' : '') + '><summary>' + escape(detailTitle)
+          + '</summary><div>' + renderFlow(detail, scope) + '</div></details>' : '') + '</div>';
+    }).join("");
+    return '<div class="phase"><div class="lanes' + (lanes.length > 1 ? ' parallel' : '') + '">' + columns + '</div></div>';
+  }).join("");
+}
+function renderSelection() {
+  const key = state.selections[state.view];
+  const isLayer = key.startsWith("layer-");
+  const info = isLayer ? describeLayer(Number(key.slice(6))) : modules[key];
+  $("layers").hidden = state.view !== "layers";
+  $("tech").hidden = state.view !== "tech";
+  for (const button of document.querySelectorAll("[data-view]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.view === state.view));
+  }
+  for (const button of document.querySelectorAll(".graph button[data-key], .catalog button[data-key]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.key === key));
+  }
+  $("detail-tag").textContent = isLayer ? "LANGUAGE BACKBONE / " + label(Number(key.slice(6))) : "INSPECT / " + key.toUpperCase();
+  $("detail-title").textContent = info.title;
+  $("detail-intro").textContent = info.intro;
+  const related = info.links.map((id) => {
+    const title = id.startsWith("layer-") ? label(Number(id.slice(6))) : modules[id].title;
+    return '<button type="button" data-key="' + id + '">' + escape(title) + '</button>';
+  }).join("");
+  const shape = '<div class="io"><div><strong>输入 shape</strong><code>' + escape(info.input)
+    + '</code></div><div><strong>输出 shape</strong><code>' + escape(info.output) + '</code></div></div>';
+  const principleSection = renderPrinciples(key);
+  $("detail-body").innerHTML = '<div class="detail-aside"><h3>张量接口</h3>' + shape
+    + (info.body ? '<p>' + escape(info.body) + '</p>' : '')
+    + (principleSection ? '<div class="detail-links"><a href="#principles">↓ 技术原理与示例</a></div>' : '')
+    + '<div class="detail-links">' + related + '</div>'
+    + '<div class="detail-links">' + info.refs.map(linkTo).join("") + '</div><div class="detail-links"><a href="#overview">↑ 返回完整数据流</a></div></div>'
+    + '<div class="detail-flow"><h3>计算流程 · 权重与 shape</h3>'
+    + (info.scope ? '<p class="scope">权重前缀 <code>' + escape(info.scope) + '</code>。矩阵按 [out, in] 标注。</p>' : '')
+    + renderFlow(info.flow, info.scope) + '</div>' + principleSection;
+  if (key === "mhc") setupSinkhorn();
+  $("status").textContent = "当前详情 " + info.title;
+}
+function showDetail() {
+  $("detail-title").focus({preventScroll: true});
+  const detail = $("detail").getBoundingClientRect();
+  if (detail.top < 0 || detail.top > innerHeight - 200) $("detail").scrollIntoView({block: "start"});
+}
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  if (button.dataset.mode) {
+    state.mode = button.dataset.mode;
+    renderOverview();
+    renderSelection();
+    return;
+  }
+  if (button.dataset.view) {
+    state.view = button.dataset.view;
+    renderSelection();
+    return;
+  }
+  const key = button.dataset.key;
+  if (!key) return;
+  state.view = key.startsWith("layer-") ? "layers" : topicKeys.includes(key) ? "tech" : "modules";
+  state.selections[state.view] = key;
+  renderSelection();
+  showDetail();
+});
+$("tech").innerHTML = '<div class="topic-grid">' + topicKeys.map((key) => node(key, modules[key].title, "", "core")).join("") + '</div>';
+$("source-list").innerHTML = Object.keys(sources).map((key) => '<li>' + linkTo(key) + '</li>').join("");
+renderOverview();
+renderLayers();
+renderSelection();
+</script>
+</body>
+</html>
